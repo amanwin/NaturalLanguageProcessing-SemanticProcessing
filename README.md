@@ -243,3 +243,133 @@ Please refer to the following notebook:
 
 You saw how the Lesk algorithm helps in word sense disambiguation. The word **'bank'** can have multiple meanings depending on the surrounding (or the context) words. The lesk algorithm helps in finding the 'correct' meaning.
 
+## Distributional Semantics
+
+### Introduction
+In the previous session, we had studied the idea of distributional semantics briefly - words that occur in similar contexts have similar meanings. In this session, we will study **distributional semantics** in detail (also sometimes called vector semantics).
+
+The idea of distributional semantics (implemented through 'word vectors') has been used heavily in semantic processing for a wide variety of applications. In this session, you will learn about word vectors, word embeddings and the use of word vectors for practical NLP applications.
+
+This session will introduce you to the following topics:
+* Word vectors (occurrence context and co-occurrence matrices)
+* Word embeddings (frequency and prediction-based embeddings)
+* Frequency-based embeddings: Latent Semantic Analysis (LSA)
+* Prediction-based embeddings: Word2Vec
+* Using word embeddings in Python for practical applications
+
+### Introduction to Distributional Semantics
+The English linguist John Firth had said in 1957 -
+    *‘You shall know a word by the company it keeps’.*
+
+In a previous segment, we had studied the concept of **distributional semantics** briefly- words which appear in the same contexts have similar meanings. This simple idea has probably been the most powerful and useful insight in creating semantic processing systems. You will now learn study this idea in detail and learn to use it for various semantic processing applications.
+
+![title](img/distributional_semantics.JPG)
+
+To summarise, the basic idea that we want to use to **quantify the similarity between words** is that words which occur in similar contexts are similar to each other. To do that, we need to represent words in a format which encapsulates its similarity with other words. For e.g. in such a representation of words, the terms ‘greebel’ and ‘train’ will be similar to each other.
+
+The most commonly used representation of words is using **'word vectors'**. There are two broad techniques to represent words as vectors:
+
+The term-document **occurrence matrix**, where each row is a term in the vocabulary and each column is a document (such as a webpage, tweet, book etc.)  
+
+The term-term **co-occurrence matrix**, where the ith row and jth column represents the occurrence of the ith word in the context of the jth word. A co-occurrence matrix always has the equal number of rows and columns, because both row and column represent the terms in the vocabulary.
+
+### Occurrence Matrix
+In the previous segment, you learnt that there are two broad ways to represent how terms (words) occur in certain contexts - 1.) The term-occurrence context matrix (or simply the **occurrence matrix**) where each row is a term and each column represents an occurrence context (such as a tweet, a book, a document  etc.) and 2) the term-term co-occurrence matrix (or the **co-occurrence matrix**) which is a **square matrix** having terms in both rows and columns.
+
+Let’s study the occurrence matrix first.
+
+![title](img/occurrence_matrix.JPG)
+
+![title](img/occurrence_matrix1.JPG)
+
+Also, notice that each word and a document has a corresponding vector representation now - each row is a vector representing a word, while each column is a vector representing a document (or context, such as a tweet, a book etc.). Thus, you can now perform all common vector operations on words and documents. 
+
+**Question**
+* Think about why the distributional frequency and distributional relevancy matrices might be a better representation than the vanilla incidence matrix.
+* **Answer**: It will give lower weights to more frequent words; for e.g. in a word-sentence matrix, if many sentences contain the word ‘might’ (which is not a stopword btw since it is also a noun), the word ‘might’ will be assigned a lower weight, after discounting for its frequent occurrence.
+
+Note that the **occurrence matrix** is also called a **term-document matrix** since its rows and columns represent terms and documents/occurrence contexts respectively.
+
+#### Comprehension: The Term-Document Matrix
+Consider four documents each of which is a paragraph taken from a movie. Assume that your vocabulary has only the following words: fear, beer, fun, magic, wizard.
+
+The table below summarises the **term-document** matrix, each entry representing the frequency of a term used in a movie:
+
+![title](img/table.JPG)
+
+**Question1**
+You know that the dot product of two vectors is large if the two vectors are ‘similar’ to each other. Based on the dot-product of vectors of each movie, which two movies are the most similar to each other?
+
+![title](img/answer.JPG)
+
+**Question2**
+
+![title](img/question2.JPG)
+
+![title](img/answer2.JPG)
+
+Term-document matrices (or **occurrence context** matrices) are commonly used in tasks such as **information retrieval**. Two documents having similar words will have similar vectors, where the **similarity between vectors** can be computed using a standard measure such as the **dot product**. Thus, you can use such representations in tasks where, for example, you want to extract documents similar to a given document from a large corpus.
+
+However, note that a real term-document matrix will be much **larger and sparse**, i.e. it will have as many rows as the size of the vocabulary (typically in tens of thousands) and most cells will have the value 0 (since most words do not occur in most documents).
+
+Using the term-document matrix to compare similarities between terms and documents poses some serious shortcomings such as with **polysemic words**, i.e. words having multiple meanings. For example, the term ‘Java’ is polysemic (coffee, island and programming language), and it will occur in documents on programming, Indonesia and cuisine/beverages.
+
+So if you imagine a high dimensional space where each document represents one dimension, the (resultant) vector of the term ‘Java’ will be a vector sum of the term’s occurrence in the dimensions corresponding to all the documents in which 'Java' occurs. Thus, the vector of ‘Java’ will represent some sort of an ‘average meaning’, rather than three distinct meanings (although if the term has a predominant sense, e.g. it occurs much frequently as a programming language than its other senses, this effect is reduced).
+
+In the next segment, you will study an alternate way to generate a distributed representation of words - the term-term **co-occurrence** matrix, where both rows and columns represent a term (word). 
+
+### Co-occurrence Matrix
+Apart from the occurrence context matrix, the other way to create a distributed representation of words is the **term-term co-occurrence** matrix (or simply the **co-occurrence matrix**), which you’ll study next.
+
+Unlike the occurrence-context matrix, where each column represents a context (such as a document), now the columns also represent a word. Thus, the co-occurrence matrix is also sometimes called the **term-term** matrix.
+
+![title](img/co-occurrence.JPG)
+
+![title](img/skip-gram.JPG)
+
+There are two ways of creating a co-occurrence matrix:
+1. **Using the occurrence context (e.g. a sentence):**
+    * Each sentence is represented as a context (there can be other definitions as well). If two terms occur in the same context, they are said to have occurred in the same occurrence context.
+2. **Skip-grams (x-skip-n-grams):**
+    * A sliding window will include the (x+n) words. This window will serve as the context now. Terms that co-occur within this context are said to have co-occurred.
+
+### Word Vectors
+In the previous section, we learnt the following two approaches to create a co-occurrence matrix:
+* Occurrence context matrix
+* x-skip-n-grams (more generally, skip-grams)
+
+![title](img/co-occurrence1.JPG)
+
+Note that it has been assumed that a word occurs in its own context. So, all the diagonal elements in the matrix are 1.
+
+To summarise, there are two approaches to create the term-term co-occurrence matrix:
+1. **Occurrence context:**
+    * A context can be defined as, for e.g., an entire sentence. Two words are said to co-occur if they appear in the same sentence. 
+2. **Skipgrams:**
+    * 3-skip means that the two words that are being considered should have at max 3 words in between them, and 2-gram means that we are going to select two words from the window.
+ 
+In a previous question on term-document matrices, you had used the dot product of two vectors to compare the similarities between vectors. Let’s now look at some other similarity metrics we can use.
+
+![title](img/word_vector.JPG)
+
+![title](img/word_vector1.JPG)
+
+![title](img/word_vector2.JPG)
+
+![title](img/word_vector3.JPG)
+
+![title](img/word_vector4.JPG)
+
+![title](img/word_vector5.JPG)
+
+![title](img/word_vector6.JPG)
+
+![title](img/word_vector7.JPG)
+
+### Word Embeddings
+In the previous segment, you saw how to create different kinds of word vectors. You may have noticed is that the occurrence and co-occurrence matrices have really large dimensions (equal to the size of the vocabulary V). This is a problem because working with such huge matrices make them almost impractical to use. You will see how to tackle this problem now.
+
+Let’s first summarise all that you have learnt about word vectors till now.
+
+
+
