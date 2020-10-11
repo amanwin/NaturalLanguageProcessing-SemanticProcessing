@@ -371,5 +371,58 @@ In the previous segment, you saw how to create different kinds of word vectors. 
 
 Let’s first summarise all that you have learnt about word vectors till now.
 
+You already know that the occurrence and co-occurrence matrices are **sparse** (really sparse!) and **high-dimensional**. Talking about high dimensionality - why not reduce the dimensionality using matrix factorization techniques such as SVD etc.?
 
+This is exactly what **word embeddings** aim to do. Word embeddings are a compressed, **low dimensional** version of the mammoth-sized occurrence and co-occurrence matrices.
 
+Each row (i.e word) has a much **shorter vector** (of size say 100, rather than tens of thousands) and is **dense**, i.e. most entries are non-zero (and you still get to retain most of the information that a full-size sparse matrix would hold).
+
+Let's see how you can create such dense word vectors.
+
+![title](img/word_embeddings.JPG)
+
+What are the different ways in which you can generate word embeddings? Let's see in the following segment.
+
+![title](img/word_embeddings1.JPG)
+
+Word embeddings can be generated using the following two broad approaches:
+1. **Frequency-based approach:** Reducing the term-document matrix (which can as well be a tf-idf, incidence matrix etc.) using a dimensionality reduction technique such as SVD (Singular Value Decomposition).
+2. **Prediction based approach:** In this approach, the input is a single word (or a combination of words) and output is a combination of context words (or a single word). A shallow neural network learns the embeddings such that the output words can be predicted using the input words.
+
+We will learn prediction based approaches in more detail shortly.
+
+### Latent Semantic Analysis (LSA)
+Let's now discuss a **frequency-based approach** to generate word embeddings - **Latent Semantic Analysis.**
+
+![title](img/word_embeddings2.JPG)
+
+![title](img/rankofmatrix.JPG)
+
+Latent Semantic Analysis (LSA) uses **Singular Value Decomposition (SVD)** to reduce the dimensionality of the matrix. Let's now visualize the process of latent semantic analysis.
+
+![title](img/lsa.JPG)
+
+In LSA, you take a noisy higher dimensional vector of a word and project it onto a lower dimensional space. The lower dimensional space is a much richer representation of the semantics of the word.
+
+LSA is widely used in processing large sets of documents for various purposes such as **document clustering** and **classification** (in the lower dimensional space), comparing the similarity between documents (e.g. recommending similar books to what a user has liked), finding relations between terms (such as synonymy and polysemy) etc.
+
+Apart from its many advantages, LSA has some **drawbacks** as well. One is that the resulting dimensions are not interpretable (the typical disadvantage of any matrix factorisation based technique such as PCA). Also, LSA cannot deal with issues such as polysemy. For e.g. we had mentioned earlier that the term ‘Java’ has three senses, and the representation of the term in the lower dimensional space will represent some sort of an ‘average meaning’ of the term rather than three different meanings.
+
+However, the convenience offered by LSA probably outweighs its disadvantages, and thus, it is a commonly used technique in semantic processing (you'll study one use on the next page).
+
+Let's now learn to implement LSA in Python. 
+
+The task here is to decrease the number of dimensions of the document-term matrix, i.e. reduce the #documents x #terms matrix to #documents x #LSA_dimensions. So, each document vector will now be represented by a lower number of dimensions.
+
+Please refer the following notebook :
+
+[LSA in Python](dataset/LSA_in_python.ipynb)
+
+### Comprehension - Latent Semantic Analysis
+Say you work at a media company (e.g. the Times group, Free Press, The Hindu etc.) and have a set of **100,000 news articles** (documents) printed over the past few months. You want to conduct various types of analyses on news articles, such as recommending relevant articles to a given user, comparing the similarity between articles etc. The size of the **vocabulary** is **20,000 words.**
+
+You create two matrices to capture the data - a vanilla **term-document matrix A** where each row represents a document d and each column represents a term w, and another matrix B which is created by performing LSA with **k=300** dimensions on the matrix A.
+
+Assume that the matrix A is constructed using tf-idf frequencies. Also, assume that each document has a label representing its news category (sports, stock market, politics, startups etc.).
+
+![title](img/lsa_table.JPG)
